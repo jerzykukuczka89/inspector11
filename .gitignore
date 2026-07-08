@@ -1,0 +1,4 @@
+_test.png
+__pycache__/
+*.pyc
+.claude/

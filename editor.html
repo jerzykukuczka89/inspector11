@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>11조 발표 홈페이지 — 내 슬라이드 편집</title>
+<style>
+  :root{
+    --navy:#02325C; --blue:#488BF8; --light-blue:#B1D0FF; --gold:#FFC000;
+    --ink:#1A2332; --gray:#5B6B7F; --bg:#F6F7FB; --red:#E60028;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"Malgun Gothic","맑은 고딕",sans-serif;background:var(--bg);color:var(--ink);}
+  .topline{height:4px;background:var(--red)}
+  header{background:var(--navy);color:#fff;padding:16px 24px}
+  header h1{margin:0;font-size:18px}
+  header p{margin:4px 0 0;font-size:13px;color:var(--light-blue)}
+  main{max-width:760px;margin:0 auto;padding:24px}
+  .notice{background:#fff;border:1px solid var(--light-blue);border-left:4px solid var(--blue);
+    border-radius:8px;padding:14px 16px;font-size:13px;color:var(--gray);margin-bottom:20px;line-height:1.6}
+  .notice b{color:var(--navy)}
+  .picker{background:#fff;border:1px solid #dde3ee;border-radius:8px;padding:20px;margin-bottom:20px}
+  .picker label{font-size:13px;color:var(--gray);display:block;margin-bottom:6px}
+  select,input[type=text],textarea{width:100%;padding:9px 10px;border:1px solid #cfd8e6;border-radius:6px;
+    font-family:inherit;font-size:14px;color:var(--ink);background:#fff}
+  textarea{resize:vertical;min-height:56px;line-height:1.5}
+  .row-inline{display:flex;gap:10px}
+  .row-inline > *{flex:1}
+  button{cursor:pointer;border:none;border-radius:6px;font-family:inherit;font-weight:700}
+  .btn-main{background:var(--navy);color:#fff;padding:11px 18px;font-size:14px}
+  .btn-main:hover{background:#01203c}
+  .btn-ghost{background:#fff;border:1px solid var(--blue);color:var(--blue);padding:8px 14px;font-size:13px}
+  .btn-small{background:var(--bg);border:1px solid #cfd8e6;color:var(--gray);padding:6px 10px;font-size:12px}
+  .btn-danger{background:#fff;border:1px solid var(--red);color:var(--red);padding:5px 9px;font-size:12px}
+  fieldset{background:#fff;border:1px solid #dde3ee;border-radius:8px;padding:18px;margin-bottom:16px}
+  legend{font-size:13px;font-weight:800;color:var(--navy);padding:0 6px}
+  .field{margin-bottom:14px}
+  .field:last-child{margin-bottom:0}
+  .field .lb{font-size:12px;color:var(--gray);margin-bottom:5px;display:flex;justify-content:space-between}
+  .hint{font-size:11px;color:#8b98ab;margin-top:4px}
+  .item{border:1px dashed #cfd8e6;border-radius:6px;padding:10px;margin-bottom:10px;position:relative}
+  .item .item-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+  .item .item-head b{font-size:12px;color:var(--gray)}
+  .chip-item{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+  .chip-item input{flex:1}
+  .chip-no{flex:0 0 44px;font-size:12px;font-weight:700;color:var(--blue)}
+  .add-btn{margin-top:4px}
+  .actions{display:flex;gap:10px;align-items:center;margin:24px 0 8px;flex-wrap:wrap}
+  .status{font-size:13px;color:var(--blue);font-weight:700}
+  .status.err{color:var(--red)}
+  .hidden{display:none}
+  footer{text-align:center;font-size:12px;color:#9aa7b8;padding:30px 0}
+</style>
+</head>
+<body>
+<div class="topline"></div>
+<header>
+  <h1>11조(함께하조) 발표 홈페이지 — 내 슬라이드 편집</h1>
+  <p>전체 디자인·레이아웃·구성은 조 대표가 관리합니다. 여기서는 <b>본인 슬라이드 문구</b>만 수정합니다.</p>
+</header>
+
+<main>
+  <div id="picker" class="picker hidden">
+    <label for="nameSelect">본인 이름을 선택하세요</label>
+    <div class="row-inline">
+      <select id="nameSelect"></select>
+      <button class="btn-main" id="goBtn" style="flex:0 0 auto">편집 시작</button>
+    </div>
+  </div>
+
+  <div id="editorArea" class="hidden">
+    <div class="notice">
+      <b>사용법</b> — 아래 항목을 수정한 뒤 맨 아래 <b>「JSON 파일로 저장」</b> 버튼을 누르면
+      <code id="fileNameHint">이름.json</code> 파일이 다운로드됩니다.
+      이 파일을 카카오톡/이메일로 조 대표에게 보내주시면 반영됩니다.
+      직접 코드를 만지지 않아도 됩니다. 강조하고 싶은 단어는 <b>**단어**</b>처럼 별표 두 개로 감싸면
+      발표 화면에서 파란색으로 강조됩니다.
+    </div>
+
+    <fieldset>
+      <legend>기본 정보</legend>
+      <div class="field">
+        <div class="lb">소속</div>
+        <input type="text" id="f_office" placeholder="예: 경기지방노동청 의정부지청">
+      </div>
+      <div class="field">
+        <div class="lb">핵심 가치 키워드 <span class="hint">(카드 중앙에 크게 표시)</span></div>
+        <input type="text" id="f_value" placeholder="예: 노동자의 삶을 지키다">
+      </div>
+      <div class="field">
+        <div class="lb">부제 <span class="hint">(제목 옆 작은 글씨)</span></div>
+        <input type="text" id="f_sub" placeholder="예: 일의 의미 — 지켜야 할 네 가지">
+      </div>
+      <div class="field">
+        <div class="lb">인용구 <span class="hint">(강조할 단어는 **이렇게**)</span></div>
+        <textarea id="f_quote" placeholder="예: 노동자들의 **일의 의미**를 보호하여..."></textarea>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>나의 관점 (2~4개 권장)</legend>
+      <div id="aspectsList"></div>
+      <button type="button" class="btn-ghost add-btn" id="addAspect">+ 관점 추가</button>
+    </fieldset>
+
+    <fieldset>
+      <legend>사이드 배너 · 다짐 문구</legend>
+      <div class="field">
+        <div class="lb">사이드 배너 한 줄</div>
+        <input type="text" id="f_banner" placeholder="예: 일의 의미를 지키다">
+      </div>
+      <div class="field">
+        <div class="lb">앞으로의 다짐 <span class="hint">(3개 고정 — 3칸 모두 채워주세요)</span></div>
+        <div id="chipsList"></div>
+      </div>
+      <div class="field">
+        <div class="lb">마무리 한 줄</div>
+        <input type="text" id="f_note" placeholder="예: 일의 의미를 퇴색시키는...삶을 지킨다.">
+      </div>
+    </fieldset>
+
+    <div class="actions">
+      <button class="btn-main" id="saveBtn">JSON 파일로 저장</button>
+      <button class="btn-ghost" id="resetBtn">원래대로 되돌리기</button>
+      <span class="status" id="status"></span>
+    </div>
+  </div>
+</main>
+<footer>data/members/이름.json 을 직접 다루지 않아도 되도록 만든 편집 도구입니다.</footer>
+
+<script>
+const params = new URLSearchParams(location.search);
+let currentName = params.get("name");
+let original = null; // 원본 JSON(수정 폼에 없는 필드 보존용, 예: img)
+
+function mdEscape(s){ return s || ""; }
+
+async function boot(){
+  if(!currentName){
+    const names = await fetch("data/members.json").then(r=>r.json());
+    const picker=document.getElementById("picker");
+    const sel=document.getElementById("nameSelect");
+    sel.innerHTML = names.map(n=>`<option value="${n}">${n}</option>`).join("");
+    picker.classList.remove("hidden");
+    document.getElementById("goBtn").addEventListener("click",()=>{
+      location.href = "editor.html?name="+encodeURIComponent(sel.value);
+    });
+    return;
+  }
+  document.getElementById("editorArea").classList.remove("hidden");
+  document.getElementById("fileNameHint").textContent = currentName+".json";
+  const res = await fetch("data/members/"+encodeURIComponent(currentName)+".json");
+  original = await res.json();
+  fillForm(original);
+}
+
+function fillForm(m){
+  document.getElementById("f_office").value = m.office || "";
+  document.getElementById("f_value").value = m.value || "";
+  document.getElementById("f_sub").value = m.sub || "";
+  document.getElementById("f_quote").value = m.quote || "";
+  document.getElementById("f_banner").value = m.banner || "";
+  document.getElementById("f_note").value = m.note || "";
+
+  const aspectsList=document.getElementById("aspectsList");
+  aspectsList.innerHTML="";
+  (m.aspects||[]).forEach(a=>addAspectRow(a));
+  if((m.aspects||[]).length===0) addAspectRow();
+
+  // 다짐은 항상 3칸 고정 (조원은 3개만 작성)
+  const chipsList=document.getElementById("chipsList");
+  const chips=(m.chips||[]).slice(0,3);
+  chipsList.innerHTML="";
+  for(let k=0;k<3;k++) addChipRow(chips[k]||"", k);
+}
+
+function addAspectRow(a){
+  a = a || {no:"",t:"",d:""};
+  const div=document.createElement("div");
+  div.className="item";
+  div.innerHTML=`
+    <div class="item-head"><b>관점</b><button type="button" class="btn-danger rm">삭제</button></div>
+    <div class="field"><div class="lb">짧은 라벨 (번호/키워드)</div><input type="text" class="a-no" placeholder="예: 01 또는 헌신"></div>
+    <div class="field"><div class="lb">제목</div><input type="text" class="a-t" placeholder="예: 경제적 안정과 생존"></div>
+    <div class="field"><div class="lb">설명</div><textarea class="a-d" placeholder="한두 문장 설명"></textarea></div>
+  `;
+  div.querySelector(".a-no").value=a.no||"";
+  div.querySelector(".a-t").value=a.t||"";
+  div.querySelector(".a-d").value=a.d||"";
+  div.querySelector(".rm").addEventListener("click",()=>div.remove());
+  document.getElementById("aspectsList").appendChild(div);
+}
+
+function addChipRow(text, idx){
+  const div=document.createElement("div");
+  div.className="chip-item";
+  div.innerHTML=`<span class="chip-no">다짐 ${idx+1}</span>
+    <input type="text" class="c-v" placeholder="예: 노동자의 일의 의미를 보호">`;
+  div.querySelector(".c-v").value = text || "";
+  document.getElementById("chipsList").appendChild(div);
+}
+
+document.getElementById("addAspect").addEventListener("click",()=>addAspectRow());
+document.getElementById("resetBtn").addEventListener("click",()=>{ if(original) fillForm(original); setStatus(""); });
+
+function setStatus(msg, isErr){
+  const el=document.getElementById("status");
+  el.textContent = msg;
+  el.classList.toggle("err", !!isErr);
+}
+
+document.getElementById("saveBtn").addEventListener("click",()=>{
+  const aspects = Array.from(document.querySelectorAll("#aspectsList .item")).map(div=>({
+    no: div.querySelector(".a-no").value.trim(),
+    t: div.querySelector(".a-t").value.trim(),
+    d: div.querySelector(".a-d").value.trim()
+  })).filter(a=>a.t || a.d);
+
+  const chips = Array.from(document.querySelectorAll("#chipsList .chip-item input")).map(i=>i.value.trim()).filter(Boolean);
+
+  const office=document.getElementById("f_office").value.trim();
+  const value=document.getElementById("f_value").value.trim();
+  const sub=document.getElementById("f_sub").value.trim();
+  const quote=document.getElementById("f_quote").value.trim();
+  const banner=document.getElementById("f_banner").value.trim();
+  const note=document.getElementById("f_note").value.trim();
+
+  if(!office || !value || !quote || aspects.length===0){
+    setStatus("소속·핵심 키워드·인용구·관점을 채워주세요.", true);
+    return;
+  }
+  if(chips.length!==3){
+    setStatus("앞으로의 다짐 3칸을 모두 채워주세요.", true);
+    return;
+  }
+
+  const out = Object.assign({}, original, {
+    office, value, sub, quote, aspects, banner, chips, note
+  });
+
+  const blob = new Blob([JSON.stringify(out, null, 2)], {type:"application/json"});
+  const url = URL.createObjectURL(blob);
+  const a=document.createElement("a");
+  a.href=url; a.download=currentName+".json";
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+  setStatus("저장 완료! 다운로드된 "+currentName+".json 파일을 조 대표에게 전달해주세요.");
+});
+
+boot();
+</script>
+</body>
+</html>
