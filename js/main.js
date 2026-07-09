@@ -706,6 +706,7 @@ document.addEventListener("touchend", e => {
 
 function handleSwipe() {
   if (window.innerWidth > 768) return; // 모바일에서만 동작
+  if (cur === 0) return; // 로그인 화면에서는 스와이프 금지
   const diff = touchStartX - touchEndX;
   if (Math.abs(diff) > 50) { // 최소 50px 이상 스와이프 시 동작
     if (diff > 0) {
