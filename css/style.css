@@ -66,7 +66,7 @@ html,body{height:100%;background:#0e1420;overflow:hidden;
 
 .lg-id-block{display:flex;flex-direction:column;align-items:flex-start;width:100%}
 .lg-form{display:flex;gap:10px;align-items:stretch;width:100%}
-.lg-inputs{display:flex;flex-direction:column;gap:10px;flex:1;min-width:0}
+.lg-inputs{display:flex;flex-direction:column;gap:10px;width:calc(100% - 160px);flex-shrink:0}
 .lg-input{height:52px;border:1px solid #C9D3DF;border-radius:4px;background:#fff;
   display:flex;align-items:center;padding:0 14px;font-size:15px;color:#333;box-sizing:border-box}
 .lg-input.pw{letter-spacing:5px;font-weight:700}
@@ -461,7 +461,11 @@ body.print-mode #viewport,body.print-mode #progress,body.print-mode #hint{displa
   body.is-mobile .dash { position: static; height: auto; min-height: 100vh; }
   body.is-mobile .slide { height: auto; position: static; display: none; }
   body.is-mobile .slide.active { display: block; position: static; }
+  body.is-mobile #mheader { order: -1 !important; position: static !important; }
+  body.is-mobile .slide.active { position: static !important; }
+  body.is-mobile .dash { position: static !important; margin-top: 0 !important; }
   
+    body.is-mobile .d-user span:nth-child(2) { display: none !important; }
   body.is-mobile .d-header { 
     height: auto; 
     padding: 10px 0; 
