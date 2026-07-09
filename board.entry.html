@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>노리터 — 노사누리 · 11조(함께하조)</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        navy: '#02325C',
+        'navy-deep': '#004B7C',
+        blue: { DEFAULT: '#1E6FE0', active: '#488BF8', light: '#B1D0FF' },
+        'gov-red': '#E60028',
+        gold: '#FFC000',
+        ink: '#1A2332',
+        gray: '#5B6B7F',
+        line: '#E2E8F1',
+        rail: '#F6F7FB',
+      },
+      fontFamily: {
+        sans: ['"맑은 고딕"', '"Malgun Gothic"', 'AppleGothic', 'sans-serif'],
+      },
+    },
+  },
+};
+</script>
+</head>
+<body>
+<div id="root"></div>
+<script type="module" src="/src/main.jsx"></script>
+</body>
+</html>

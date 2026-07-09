@@ -1,0 +1,17 @@
+{
+  "name": "11jo-homepage",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev:board": "vite --open /board.entry.html",
+    "build:board": "vite build && node scripts/copy-board-build.js"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.4",
+    "vite": "^5.4.11"
+  }
+}
