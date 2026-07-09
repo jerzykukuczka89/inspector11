@@ -61,7 +61,7 @@ export default function App() {
             <span className="font-bold text-gray-300">로그인 필요</span>
           )}
           <span className="bg-white/15 px-2 py-0.5 rounded font-mono">10 : 00</span>
-          <a href="index.html" className="text-[#ffd7d7] hover:underline">
+          <a href="index.html#closing" className="text-[#ffd7d7] hover:underline">
             뒤로가기
           </a>
         </div>
