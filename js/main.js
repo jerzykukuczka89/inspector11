@@ -690,3 +690,28 @@ document.addEventListener("keydown", e => {
     }
   }
 });
+
+
+/* 모바일 스와이프 제스처 (좌우 넘기기) */
+let touchStartX = 0;
+let touchEndX = 0;
+document.addEventListener("touchstart", e => {
+  touchStartX = e.changedTouches[0].screenX;
+}, {passive: true});
+
+document.addEventListener("touchend", e => {
+  touchEndX = e.changedTouches[0].screenX;
+  handleSwipe();
+}, {passive: true});
+
+function handleSwipe() {
+  if (window.innerWidth > 768) return; // 모바일에서만 동작
+  const diff = touchStartX - touchEndX;
+  if (Math.abs(diff) > 50) { // 최소 50px 이상 스와이프 시 동작
+    if (diff > 0) {
+      next(); // 왼쪽으로 쓸어넘김 -> 다음
+    } else {
+      prev(); // 오른쪽으로 쓸어넘김 -> 이전
+    }
+  }
+}
