@@ -1,6 +1,39 @@
+import { useEffect, useState } from 'react';
+import { onAuthStateChanged, signOut } from 'firebase/auth';
+import { auth } from '../firebase.js';
 import Board from './Board.jsx';
+import Login from './Login.jsx';
 
 export default function App() {
+  const [user, setUser] = useState(null);
+  const [authLoading, setAuthLoading] = useState(true);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+      setAuthLoading(false);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+    } catch (err) {
+      console.error('로그아웃 오류:', err);
+    }
+  };
+
+  if (authLoading) {
+    return (
+      <div className="bg-[#EDF1F7] min-h-screen flex items-center justify-center">
+        <div className="text-navy font-bold text-lg animate-pulse">
+          사용자 정보를 불러오는 중...
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-[#EDF1F7] text-ink min-h-screen flex flex-col">
       <div className="h-1 bg-gov-red shrink-0" />
@@ -12,7 +45,21 @@ export default function App() {
         </div>
         <div className="flex-1 text-[#DCE8F6] text-sm font-bold pl-4">근로감독행정시스템</div>
         <div className="flex items-center gap-2.5 pr-4 text-[#EAF2FC] text-xs">
-          <span className="font-bold">11조 함께하조</span>
+          {user ? (
+            <>
+              <span className="font-bold bg-white/10 px-2 py-1 rounded">
+                {user.displayName || user.email}
+              </span>
+              <button
+                onClick={handleLogout}
+                className="text-[#ffd7d7] hover:underline bg-transparent border-none cursor-pointer font-bold"
+              >
+                로그아웃
+              </button>
+            </>
+          ) : (
+            <span className="font-bold text-gray-300">로그인 필요</span>
+          )}
           <span className="bg-white/15 px-2 py-0.5 rounded font-mono">10 : 00</span>
           <a href="index.html" className="text-[#ffd7d7] hover:underline">
             뒤로가기
@@ -37,9 +84,10 @@ export default function App() {
         </aside>
 
         <main className="flex-1 p-4 md:p-5 overflow-auto">
-          <Board />
+          {user ? <Board user={user} /> : <Login onLoginSuccess={setUser} />}
         </main>
       </div>
     </div>
   );
 }
+

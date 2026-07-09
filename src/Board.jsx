@@ -1,27 +1,40 @@
 import { useEffect, useMemo, useState } from 'react';
-
-const STORAGE_KEY = 'team_messages';
+import { 
+  collection, 
+  addDoc, 
+  onSnapshot, 
+  query, 
+  orderBy, 
+  deleteDoc, 
+  doc,
+  updateDoc
+} from 'firebase/firestore';
+import { db } from '../firebase.js';
 
 function fmtDate(iso) {
+  if (!iso) return '';
   const d = new Date(iso);
   const y = d.getFullYear();
   const m = String(d.getMonth() + 1).padStart(2, '0');
   const day = String(d.getDate()).padStart(2, '0');
-  return `${y}.${m}.${day}`;
+  const hr = String(d.getHours()).padStart(2, '0');
+  const min = String(d.getMinutes()).padStart(2, '0');
+  return `${y}.${m}.${day} ${hr}:${min}`;
 }
 
-
-function loadMessages() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : [];
-  } catch {
-    return [];
+export default function Board({ user }) {
+  // 로그인 보호막 작동
+  if (!user) {
+    return (
+      <div className="flex flex-col items-center justify-center p-8 bg-white border border-line rounded-xl shadow-sm text-center">
+        <span className="text-4xl mb-4">⚠️</span>
+        <h3 className="text-lg font-bold text-navy mb-2">접근 권한이 없습니다.</h3>
+        <p className="text-gray text-sm mb-4">로그인한 사용자만 게시판을 이용하실 수 있습니다.</p>
+      </div>
+    );
   }
-}
 
-export default function Board() {
-  const [posts, setPosts] = useState(() => loadMessages());
+  const [posts, setPosts] = useState([]);
   const [author, setAuthor] = useState('');
   const [message, setMessage] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
@@ -31,9 +44,33 @@ export default function Board() {
   const [toast, setToast] = useState(null);
   const [enterId, setEnterId] = useState(null);
 
+  // 댓글 입력 창 상태 관리 { [postId]: '댓글텍스트' }
+  const [commentInputs, setCommentInputs] = useState({});
+
+  // 사용자 정보 변경 시 작성자 자동 할당
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(posts));
-  }, [posts]);
+    if (user) {
+      setAuthor(user.displayName || user.email.split('@')[0]);
+    }
+  }, [user]);
+
+  // Firestore 실시간 데이터 조회 (onSnapshot)
+  useEffect(() => {
+    const q = query(collection(db, 'messages'), orderBy('createdAt', 'desc'));
+    
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const list = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      setPosts(list);
+    }, (error) => {
+      console.error('Firestore snapshot error:', error);
+      showToast('게시글을 불러오는 중 오류가 발생했습니다.', 'warn');
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   useEffect(() => {
     if (!toast) return undefined;
@@ -50,12 +87,13 @@ export default function Board() {
     const q = searchQuery.toLowerCase();
     return posts.filter(
       (p) =>
-        p.author.toLowerCase().includes(q) ||
-        p.message.toLowerCase().includes(q)
+        (p.author && p.author.toLowerCase().includes(q)) ||
+        (p.message && p.message.toLowerCase().includes(q))
     );
   }, [posts, searchQuery]);
 
-  function handleSubmit(e) {
+  // Firestore 글쓰기 등록 처리
+  async function handleSubmit(e) {
     e.preventDefault();
     const name = author.trim();
     const body = message.trim();
@@ -65,22 +103,88 @@ export default function Board() {
     }
 
     const item = {
-      id: `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`,
       author: name,
       message: body,
       views: 0,
       likes: 0,
+      comments: [], // 댓글 초기화용 빈 배열
       createdAt: new Date().toISOString(),
     };
 
-    setPosts((prev) => [item, ...prev]);
-    setAuthor('');
-    setMessage('');
-    setEnterId(item.id);
-    setTimeout(() => setEnterId(null), 600);
-    setStatus('등록되었습니다.');
-    showToast('등록되었습니다.', 'ok');
-    setTimeout(() => setStatus(''), 2500);
+    try {
+      setStatus('등록 중...');
+      const docRef = await addDoc(collection(db, 'messages'), item);
+      setMessage('');
+      setEnterId(docRef.id);
+      setTimeout(() => setEnterId(null), 600);
+      setStatus('등록되었습니다.');
+      showToast('등록되었습니다.', 'ok');
+      setTimeout(() => setStatus(''), 2500);
+    } catch (err) {
+      console.error('Error writing document: ', err);
+      showToast('등록에 실패했습니다: ' + err.message, 'warn');
+      setStatus('');
+    }
+  }
+
+  // 댓글 입력 핸들러
+  function handleCommentChange(postId, val) {
+    setCommentInputs((prev) => ({
+      ...prev,
+      [postId]: val
+    }));
+  }
+
+  // 댓글 등록 처리
+  async function handleCommentSubmit(e, postId) {
+    e.preventDefault();
+    const text = (commentInputs[postId] || '').trim();
+    if (!text) return;
+
+    const commentAuthor = user.displayName || user.email.split('@')[0];
+    const newComment = {
+      id: `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`,
+      author: commentAuthor,
+      text: text,
+      createdAt: new Date().toISOString()
+    };
+
+    const postRef = doc(db, 'messages', postId);
+    const targetPost = posts.find((p) => p.id === postId);
+    const existingComments = targetPost.comments || [];
+
+    try {
+      await updateDoc(postRef, {
+        comments: [...existingComments, newComment]
+      });
+      setCommentInputs((prev) => ({
+        ...prev,
+        [postId]: ''
+      }));
+      showToast('댓글이 등록되었습니다.', 'ok');
+    } catch (err) {
+      console.error('Error adding comment: ', err);
+      showToast('댓글 등록에 실패했습니다.', 'warn');
+    }
+  }
+
+  // 댓글 삭제 처리
+  async function handleCommentDelete(postId, commentId) {
+    if (!confirm('댓글을 삭제할까요?')) return;
+
+    const postRef = doc(db, 'messages', postId);
+    const targetPost = posts.find((p) => p.id === postId);
+    const updatedComments = (targetPost.comments || []).filter((c) => c.id !== commentId);
+
+    try {
+      await updateDoc(postRef, {
+        comments: updatedComments
+      });
+      showToast('댓글이 삭제되었습니다.', 'ok');
+    } catch (err) {
+      console.error('Error deleting comment: ', err);
+      showToast('댓글 삭제에 실패했습니다.', 'warn');
+    }
   }
 
   function handleSearch() {
@@ -102,14 +206,28 @@ export default function Board() {
     });
   }
 
-  function handleDelete() {
+  // Firestore 글 삭제 처리
+  async function handleDelete() {
     if (!selected.size) {
       alert('삭제할 게시글을 선택하세요.');
       return;
     }
     if (!confirm(`선택한 ${selected.size}건을 삭제할까요?`)) return;
-    setPosts((prev) => prev.filter((p) => !selected.has(p.id)));
-    setSelected(new Set());
+    
+    try {
+      setStatus('삭제 중...');
+      const deletePromises = Array.from(selected).map((id) => 
+        deleteDoc(doc(db, 'messages', id))
+      );
+      await Promise.all(deletePromises);
+      setSelected(new Set());
+      showToast('삭제되었습니다.', 'ok');
+      setStatus('');
+    } catch (err) {
+      console.error('Error deleting document: ', err);
+      showToast('삭제에 실패했습니다: ' + err.message, 'warn');
+      setStatus('');
+    }
   }
 
   const allChecked = filtered.length > 0 && filtered.every((p) => selected.has(p.id));
@@ -185,8 +303,9 @@ export default function Board() {
               value={author}
               onChange={(e) => setAuthor(e.target.value)}
               maxLength={30}
-              placeholder="이름을 입력하세요"
-              className="w-full h-10 px-3 border border-[#C9D3DF] rounded-md text-sm text-ink focus-ring-blue"
+              placeholder="로그인이 필요합니다"
+              readOnly
+              className="w-full h-10 px-3 border border-[#C9D3DF] rounded-md text-sm text-ink bg-gray-100 cursor-not-allowed"
             />
           </div>
           <div>
@@ -213,7 +332,6 @@ export default function Board() {
             <button
               type="button"
               onClick={() => {
-                setAuthor('');
                 setMessage('');
               }}
               className="h-10 px-4 bg-white border border-[#bbb] text-gray text-sm font-semibold rounded-md hover:bg-rail"
@@ -297,10 +415,63 @@ export default function Board() {
                       <p className="text-sm text-ink leading-relaxed whitespace-pre-wrap break-words">
                         {p.message}
                       </p>
+                      
+                      {/* 추천/조회수 메타데이터 영역 */}
                       <div className="flex gap-3 mt-3 text-[11px] text-gray">
                         <span>조회 {p.views || 0}</span>
                         <span>추천 {p.likes || 0}</span>
                       </div>
+
+                      {/* 댓글 기능 섹션 */}
+                      <div className="mt-4 pt-3 border-t border-line/60">
+                        <div className="flex items-center gap-1 mb-2 text-xs font-bold text-[#666]">
+                          <span>💬 댓글 {p.comments?.length || 0}개</span>
+                        </div>
+
+                        {/* 댓글 목록 */}
+                        {p.comments && p.comments.length > 0 && (
+                          <div className="space-y-2 mb-3 max-h-[250px] overflow-y-auto pr-1">
+                            {p.comments.map((c) => (
+                              <div key={c.id} className="bg-[#f8fafc] border border-[#e2e8f0] p-2.5 rounded-md text-xs">
+                                <div className="flex items-center gap-1.5 mb-1">
+                                  <span className="font-bold text-navy">{c.author}</span>
+                                  <span className="text-[10px] text-gray ml-auto">{fmtDate(c.createdAt)}</span>
+                                  {/* 댓글 작성자 본인 또는 게시판 주인 권한으로 삭제 허용 */}
+                                  {(c.author === author || user.email.split('@')[0] === c.author) && (
+                                    <button 
+                                      type="button"
+                                      onClick={() => handleCommentDelete(p.id, c.id)}
+                                      className="text-red-500 hover:text-red-700 ml-1.5 font-bold transition-colors"
+                                      title="댓글 삭제"
+                                    >
+                                      ✕
+                                    </button>
+                                  )}
+                                </div>
+                                <p className="text-ink leading-relaxed whitespace-pre-wrap break-words">{c.text}</p>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+
+                        {/* 댓글 입력 폼 */}
+                        <form onSubmit={(e) => handleCommentSubmit(e, p.id)} className="flex gap-2">
+                          <input
+                            type="text"
+                            placeholder="댓글을 입력해 주세요..."
+                            value={commentInputs[p.id] || ''}
+                            onChange={(e) => handleCommentChange(p.id, e.target.value)}
+                            className="flex-1 h-8 px-2.5 border border-[#C9D3DF] rounded text-xs focus:outline-none focus:ring-1 focus:ring-blue/50"
+                          />
+                          <button
+                            type="submit"
+                            className="h-8 px-3 bg-blue hover:bg-blue/90 text-white font-bold text-xs rounded transition-colors shrink-0"
+                          >
+                            등록
+                          </button>
+                        </form>
+                      </div>
+
                     </div>
                   </div>
                 </article>
