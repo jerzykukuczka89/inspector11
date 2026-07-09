@@ -15,7 +15,7 @@ export default function App() {
           <span className="font-bold">11조 함께하조</span>
           <span className="bg-white/15 px-2 py-0.5 rounded font-mono">10 : 00</span>
           <a href="index.html" className="text-[#ffd7d7] hover:underline">
-            ← 발표로
+            뒤로가기
           </a>
         </div>
       </header>
