@@ -12,6 +12,23 @@ function mdAccent(s){
   return s ? s.replace(/\*\*(.+?)\*\*/g,'<span class="accent">$1</span>') : s;
 }
 
+function formatMotto(html){
+  // <br> 줄을 block span으로 — 브라우저·데이터 소스별 br 렌더 차이와 잘못된 단어 쪼개짐 방지
+  if(!html) return "";
+  return html.split(/<br\s*\/?>/i).map(line => `<span class="b-motto-line">${line}</span>`).join("");
+}
+
+function mottoFontSize(mottoHtml){
+  const mlines=(mottoHtml||"").split(/<br\s*\/?>/i).map(s=>s.replace(/<[^>]*>/g,""));
+  const mlen=Math.max(...mlines.map(s=>s.length),1);
+  const lineCount=mlines.length;
+  let mfs=mlen<=6?29:(mlen<=14?22:(mlen<=26?19:17));
+  // 좁은 배너(~169px)에서 긴 줄이 자동 줄바꿈되면 글자 축소
+  if(mlen>9) mfs=Math.min(mfs, mlen<=14?20:(mlen<=20?17:15));
+  if(lineCount>=3) mfs=Math.min(mfs, 20);
+  return mfs;
+}
+
 function embeddedFallback(){
   const el = document.getElementById("embedded-data");
   const all = JSON.parse(el.textContent);
@@ -256,9 +273,7 @@ function memberContentHTML(m,idx){
         <div class="chips">${m.chips.slice(0,3).map(c=>`<div class="chip" tabindex="0" role="button"><span class="ck">${c.k}</span><div class="chip-pop">${c.d}</div></div>`).join("")}</div>
         ${koreaMapHTML(m)}
       </div>`;
-    const mlines=(m.motto||"").split(/<br\s*\/?>/i).map(s=>s.replace(/<[^>]*>/g,""));
-    const mlen=Math.max(...mlines.map(s=>s.length));
-    const mfs=mlen<=6?29:(mlen<=14?22:(mlen<=26?19:17));
+    const mfs=mottoFontSize(m.motto);
     const side=`
       <div class="side">
         <div class="banner-flip" tabindex="0" role="button" title="마우스를 올리면 좌우명이 나타납니다"><div class="bf-inner">
@@ -266,7 +281,7 @@ function memberContentHTML(m,idx){
             <div class="b-label">나의 좌우명</div>
             <div class="b-hint">🖱 마우스를 올려보세요</div>
           </div>
-          <div class="banner bf-back"><div class="b-motto" style="font-size:${mfs}px">${m.motto}</div></div>
+          <div class="banner bf-back"><div class="b-motto" style="font-size:${mfs}px">${formatMotto(m.motto)}</div></div>
         </div></div>
         ${m.photo?photoCardHTML(m):calHTML()}
       </div>`;
