@@ -715,3 +715,21 @@ function handleSwipe() {
     }
   }
 }
+
+
+/* 터치 디바이스 호환을 위한 툴팁/플립카드 토글 */
+document.addEventListener("click", e => {
+  // 열려있는 모든 팝업 닫기 (클릭된 요소 제외)
+  const isKw = e.target.closest(".kw-wrap");
+  const isChip = e.target.closest(".chip");
+  const isBanner = e.target.closest(".banner-flip");
+  
+  if (!isKw) document.querySelectorAll(".kw-wrap.open").forEach(el => el.classList.remove("open"));
+  if (!isChip) document.querySelectorAll(".chip.open").forEach(el => el.classList.remove("open"));
+  if (!isBanner) document.querySelectorAll(".banner-flip.open").forEach(el => el.classList.remove("open"));
+
+  // 클릭된 요소 토글
+  if (isKw) isKw.classList.toggle("open");
+  if (isChip) isChip.classList.toggle("open");
+  if (isBanner) isBanner.classList.toggle("open");
+});

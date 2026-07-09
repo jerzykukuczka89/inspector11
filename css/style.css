@@ -196,7 +196,7 @@ html,body{height:100%;background:#0e1420;overflow:hidden;
   padding:13px 16px;font-size:15px;line-height:1.7;color:var(--ink);font-weight:500;
   box-shadow:0 14px 38px rgba(20,50,90,.22);opacity:0;visibility:hidden;transform:translateY(-6px);
   transition:opacity .25s ease,transform .25s ease,visibility .25s}
-.kw-wrap:hover .kw-pop{opacity:1;visibility:visible;transform:translateY(0)}
+.kw-wrap:hover .kw-pop,.kw-wrap.open .kw-pop{opacity:1;visibility:visible;transform:translateY(0)}
 .kw-pop .accent{color:var(--gold);font-weight:800}
 .metrics{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
 .metric{display:flex;align-items:center;gap:10px;background:var(--rail);border:1px solid var(--line);
@@ -218,7 +218,7 @@ html,body{height:100%;background:#0e1420;overflow:hidden;
 .banner-flip{perspective:900px;flex-shrink:0}
 .bf-inner{position:relative;min-height:100px;transform-style:preserve-3d;
   transition:transform .65s cubic-bezier(.35,.15,.25,1)}
-.banner-flip:hover .bf-inner{transform:rotateY(180deg)}
+.banner-flip:hover .bf-inner,.banner-flip.open .bf-inner{transform:rotateY(180deg)}
 .banner-flip .banner{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;
   display:flex;flex-direction:column;justify-content:flex-start}
 .banner-flip .bf-back{transform:rotateY(180deg);justify-content:center}
@@ -285,9 +285,9 @@ html,body{height:100%;background:#0e1420;overflow:hidden;
   padding:9px 12px;font-size:13.5px;line-height:1.6;color:var(--ink);font-weight:500;
   box-shadow:0 10px 26px rgba(20,50,90,.2);opacity:0;visibility:hidden;transform:translateY(4px);
   transition:opacity .22s ease,transform .22s ease,visibility .22s}
-.chip:hover .chip-pop{opacity:1;visibility:visible;transform:translateY(0)}
+.chip:hover .chip-pop,.chip.open .chip-pop{opacity:1;visibility:visible;transform:translateY(0)}
 .chip:nth-child(3) .chip-pop{bottom:auto;top:calc(100% + 6px);transform:translateY(-4px)}
-.chip:nth-child(3):hover .chip-pop{transform:translateY(0)}
+.chip:nth-child(3):hover .chip-pop,.chip:nth-child(3).open .chip-pop{transform:translateY(0)}
 
 /* 한반도 지도(백지도, 제주·울릉도 제외) — '앞으로의 다짐' 카드 하단을 가득 채움 */
 .kr-slot{position:relative;flex:1 1 auto;min-height:130px;margin-top:10px}
@@ -490,6 +490,12 @@ body.print-mode #viewport,body.print-mode #progress,body.print-mode #hint{displa
   
   body.is-mobile .d-body { height: auto; display: block; }
   body.is-mobile .d-rail { display: none; }
+
+  body.is-mobile .side { order: -1; margin-bottom: 12px; }
+  body.is-mobile .member-photo { flex-direction: row; align-items: stretch; max-height: 180px; }
+  body.is-mobile .member-photo .mp-frame { width: 50%; max-height: 180px; }
+  body.is-mobile .member-photo .photo-caption { width: 50%; display: flex; flex-direction: column; justify-content: center; }
+
   
   body.is-mobile .card { margin-bottom: 12px; }
   
