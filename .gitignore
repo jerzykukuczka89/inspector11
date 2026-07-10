@@ -4,3 +4,5 @@ __pycache__/
 .claude/
 node_modules/
 board-app/
+assets/_models/
+assets/_preview/
