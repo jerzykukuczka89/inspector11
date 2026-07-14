@@ -39,10 +39,10 @@ export default function App() {
       <div className="h-1 bg-gov-red shrink-0" />
 
       <header className="h-[60px] bg-navy flex items-center shrink-0">
-        <div className="d-logo flex items-center gap-2 pl-4 pr-5">
+        <a href="index.html#closing" className="d-logo flex items-center gap-2 pl-4 pr-5 cursor-pointer">
           <img src="assets_emblem_only.svg" alt="정부상징" className="h-8 w-8 object-contain" />
           <b className="text-navy text-lg font-extrabold tracking-tight">노사누리</b>
-        </div>
+        </a>
         <div className="flex-1 text-[#DCE8F6] text-sm font-bold pl-4">근로감독행정시스템</div>
         <div className="flex items-center gap-2.5 pr-4 text-[#EAF2FC] text-xs">
           {user ? (
