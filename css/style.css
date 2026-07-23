@@ -724,18 +724,45 @@ body.print-mode #viewport,body.print-mode #progress,body.print-mode #hint{displa
     height: auto;
     overflow: visible;
   }
+  body.is-mobile .hero {
+    padding: 12px 14px 10px;
+  }
+  body.is-mobile .hero .c-title {
+    margin-bottom: 6px;
+  }
   body.is-mobile .hero .kw {
     font-size: 28px !important;
   }
   body.is-mobile .hero .kw-sub {
     font-size: 13px;
   }
+  body.is-mobile .hero .kw-wrap {
+    gap: 10px;
+  }
+  /* 닫힌 팝업이 relative면 인용구 높이만큼 허연 여백 → 닫힘=absolute, 열림=relative */
   body.is-mobile .kw-pop {
-    width: min(100%, 92vw);
+    width: 100%;
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    max-height: 0;
+    overflow: hidden;
+    padding: 0 14px;
+    border-width: 0;
+    box-shadow: none;
+    pointer-events: none;
+  }
+  body.is-mobile .kw-wrap.open .kw-pop,
+  body.is-mobile .kw-wrap:hover .kw-pop {
     position: relative;
     top: 8px;
-    left: 0;
+    max-height: none;
+    overflow: visible;
+    padding: 12px 14px;
+    border-width: 1px;
+    border-left-width: 4px;
     box-shadow: 0 8px 20px rgba(20, 50, 90, 0.16);
+    pointer-events: auto;
   }
   body.is-mobile .metrics {
     flex-direction: column;

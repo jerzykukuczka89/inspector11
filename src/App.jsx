@@ -4,17 +4,36 @@ import { auth } from '../firebase.js';
 import Board from './Board.jsx';
 import Login from './Login.jsx';
 
+const DEMO_USER = {
+  displayName: '김재원',
+  email: 'demo@11jo.local',
+};
+
+function isBoardDemo() {
+  try {
+    return new URLSearchParams(window.location.search).get('demo') === '1';
+  } catch {
+    return false;
+  }
+}
+
 export default function App() {
   const [user, setUser] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
+  const demo = isBoardDemo();
 
   useEffect(() => {
+    if (demo) {
+      setUser(DEMO_USER);
+      setAuthLoading(false);
+      return undefined;
+    }
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
       setAuthLoading(false);
     });
     return () => unsubscribe();
-  }, []);
+  }, [demo]);
 
   const handleLogout = async () => {
     try {
