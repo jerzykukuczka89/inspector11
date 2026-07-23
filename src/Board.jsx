@@ -255,13 +255,13 @@ export default function Board({ user }) {
           </span>
           <span>노리터</span>
         </h1>
-        <p className="text-[13px] text-[#666] mt-2 tracking-tight">
+        <p className="text-[12px] sm:text-[13px] text-[#666] mt-2 tracking-tight break-keep">
           ( 알림 · 소통 &gt; 소통 &gt; <span className="text-[#333]">노리터</span> )
         </p>
       </div>
 
       <div className="bg-[#E8EDF3] border border-[#C5CED9] rounded px-3 py-2.5 mb-4 flex flex-wrap gap-2 items-center">
-        <select className="h-8 px-2 border border-[#bbb] rounded text-sm bg-white text-ink">
+        <select className="h-8 px-2 border border-[#bbb] rounded text-sm bg-white text-ink shrink-0">
           <option>제목</option>
           <option>내용</option>
           <option>게시자</option>
@@ -272,12 +272,12 @@ export default function Board({ user }) {
           onChange={(e) => setSearchInput(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleSearch())}
           placeholder="검색어를 입력하세요"
-          className="flex-1 min-w-[160px] h-8 px-3 border border-[#bbb] rounded text-sm bg-white"
+          className="flex-1 min-w-0 basis-[140px] h-8 px-3 border border-[#bbb] rounded text-sm bg-white"
         />
         <button
           type="button"
           onClick={handleSearch}
-          className="h-8 px-4 bg-navy-deep text-white text-sm font-bold rounded flex items-center gap-1.5 hover:bg-[#003a61]"
+          className="h-8 px-4 bg-navy-deep text-white text-sm font-bold rounded flex items-center gap-1.5 hover:bg-[#003a61] shrink-0"
         >
           <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
             <circle cx="11" cy="11" r="7" />
@@ -322,7 +322,7 @@ export default function Board({ user }) {
               className="w-full px-3 py-2.5 border border-[#C9D3DF] rounded-md text-sm text-ink leading-relaxed resize-y min-h-[120px] focus-ring-blue"
             />
           </div>
-          <div className="flex items-center gap-3 pt-1">
+          <div className="flex flex-wrap items-center gap-3 pt-1">
             <button
               type="submit"
               className="h-10 px-6 bg-navy-deep hover:bg-[#003a61] text-white text-sm font-bold rounded-md transition-colors"
@@ -338,7 +338,7 @@ export default function Board({ user }) {
             >
               초기화
             </button>
-            {status && <p className="text-sm text-blue font-bold">{status}</p>}
+            {status && <p className="text-sm text-blue font-bold w-full sm:w-auto">{status}</p>}
           </div>
         </form>
       </section>
@@ -398,7 +398,7 @@ export default function Board({ user }) {
                       onChange={(e) => toggleOne(p.id, e.target.checked)}
                     />
                     <div className="flex-1 min-w-0">
-                      <div className="flex flex-wrap items-center gap-2 mb-2">
+                      <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mb-2">
                         {isNewest ? (
                           <span className="text-[11px] font-extrabold text-blue bg-blue-soft px-2 py-0.5 rounded-full">
                             NEW
@@ -409,10 +409,12 @@ export default function Board({ user }) {
                           </span>
                         )}
                         <span className="text-[11px] text-gray">공통</span>
-                        <span className="text-xs text-gray ml-auto">{fmtDate(p.createdAt)}</span>
+                        <span className="text-[11px] sm:text-xs text-gray sm:ml-auto w-full sm:w-auto">
+                          {fmtDate(p.createdAt)}
+                        </span>
                       </div>
-                      <p className="text-[15px] font-extrabold text-navy mb-1.5">{p.author}</p>
-                      <p className="text-sm text-ink leading-relaxed whitespace-pre-wrap break-words">
+                      <p className="text-[15px] font-extrabold text-navy mb-1.5 break-words">{p.author}</p>
+                      <p className="text-sm text-ink leading-relaxed whitespace-pre-wrap break-words [overflow-wrap:anywhere]">
                         {p.message}
                       </p>
                       
@@ -432,36 +434,36 @@ export default function Board({ user }) {
                         {p.comments && p.comments.length > 0 && (
                           <div className="space-y-2 mb-3 max-h-[250px] overflow-y-auto pr-1">
                             {p.comments.map((c) => (
-                              <div key={c.id} className="bg-[#f8fafc] border border-[#e2e8f0] p-2.5 rounded-md text-xs">
-                                <div className="flex items-center gap-1.5 mb-1">
-                                  <span className="font-bold text-navy">{c.author}</span>
-                                  <span className="text-[10px] text-gray ml-auto">{fmtDate(c.createdAt)}</span>
+                              <div key={c.id} className="bg-[#f8fafc] border border-[#e2e8f0] p-2.5 rounded-md text-xs min-w-0">
+                                <div className="flex flex-wrap items-center gap-x-1.5 gap-y-1 mb-1">
+                                  <span className="font-bold text-navy break-words min-w-0">{c.author}</span>
+                                  <span className="text-[10px] text-gray sm:ml-auto">{fmtDate(c.createdAt)}</span>
                                   {/* 댓글 작성자 본인 또는 게시판 주인 권한으로 삭제 허용 */}
                                   {(c.author === author || user.email.split('@')[0] === c.author) && (
                                     <button 
                                       type="button"
                                       onClick={() => handleCommentDelete(p.id, c.id)}
-                                      className="text-red-500 hover:text-red-700 ml-1.5 font-bold transition-colors"
+                                      className="text-red-500 hover:text-red-700 font-bold transition-colors shrink-0"
                                       title="댓글 삭제"
                                     >
                                       ✕
                                     </button>
                                   )}
                                 </div>
-                                <p className="text-ink leading-relaxed whitespace-pre-wrap break-words">{c.text}</p>
+                                <p className="text-ink leading-relaxed whitespace-pre-wrap break-words [overflow-wrap:anywhere]">{c.text}</p>
                               </div>
                             ))}
                           </div>
                         )}
 
                         {/* 댓글 입력 폼 */}
-                        <form onSubmit={(e) => handleCommentSubmit(e, p.id)} className="flex gap-2">
+                        <form onSubmit={(e) => handleCommentSubmit(e, p.id)} className="flex gap-2 min-w-0">
                           <input
                             type="text"
                             placeholder="댓글을 입력해 주세요..."
                             value={commentInputs[p.id] || ''}
                             onChange={(e) => handleCommentChange(p.id, e.target.value)}
-                            className="flex-1 h-8 px-2.5 border border-[#C9D3DF] rounded text-xs focus:outline-none focus:ring-1 focus:ring-blue/50"
+                            className="flex-1 min-w-0 h-8 px-2.5 border border-[#C9D3DF] rounded text-xs focus:outline-none focus:ring-1 focus:ring-blue/50"
                           />
                           <button
                             type="submit"
@@ -480,7 +482,7 @@ export default function Board({ user }) {
           )}
         </div>
 
-        <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3 border-t border-line bg-rail text-xs text-gray">
+        <div className="flex flex-wrap items-center justify-between gap-2 px-3 sm:px-4 py-3 border-t border-line bg-rail text-xs text-gray">
           <div className="flex items-center gap-1">
             <button type="button" className="w-7 h-7 border border-[#bbb] bg-white rounded">
               «
@@ -492,9 +494,9 @@ export default function Board({ user }) {
               »
             </button>
           </div>
-          <div className="flex items-center gap-2">
-            <span>1 / 1</span>
-            <select className="h-7 px-1 border border-[#bbb] rounded bg-white text-ink">
+          <div className="flex items-center gap-2 min-w-0">
+            <span className="shrink-0">1 / 1</span>
+            <select className="h-7 max-w-full px-1 border border-[#bbb] rounded bg-white text-ink">
               <option>목록 개수 20</option>
               <option>목록 개수 50</option>
             </select>

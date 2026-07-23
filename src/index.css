@@ -10,6 +10,63 @@ body {
   clip-path: path('M 0,0 H 290 C 230,0 230,60 170,60 H 0 Z');
 }
 
+.board-header {
+  height: 60px;
+}
+
+/* 노리터 게시판 — 모바일: 헤더/본문 글씨 넘침 방지 */
+@media (max-width: 640px) {
+  .board-header {
+    height: auto;
+    min-height: 52px;
+    flex-wrap: wrap;
+    row-gap: 6px;
+    padding: 8px 0 10px;
+  }
+
+  .board-shell .d-logo {
+    width: auto;
+    max-width: calc(100% - 16px);
+    height: 44px;
+    margin-left: 8px;
+    padding-left: 10px;
+    padding-right: 14px;
+    clip-path: none;
+    border-radius: 0 0 10px 0;
+  }
+
+  .board-shell .d-logo b {
+    font-size: 16px;
+  }
+
+  .board-header-title {
+    display: none;
+  }
+
+  .board-header-actions {
+    width: 100%;
+    padding: 0 12px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 8px;
+  }
+
+  .board-timer {
+    display: none;
+  }
+
+  .board-user-label {
+    max-width: min(160px, 42vw);
+  }
+
+  .board-toast {
+    top: 12px;
+    min-width: 0;
+    width: calc(100vw - 24px);
+    max-width: none;
+  }
+}
+
 .tbl-head th {
   background: #e8f0fa;
   color: #333;
